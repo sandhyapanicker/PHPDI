@@ -6,11 +6,11 @@ class SubscriberManager {
 	protected $pdo;
 	protected $config;
 	
-	public function __construct($config) {
+	public function __construct($pdo, $mailer) {
 		// Get list of subscribers from datasource.
 		//$dsn = 'sqlite:' . __DIR__ . '/../data/database.sqlite';
-		$this->config = $config;
-		$this->pdo = new PDO($config['dsn'] );
+		$this->pdo = $pdo;
+		$this->mailer = $mailer;
 	}
 	public function notifySubscriber() {
 		
@@ -20,7 +20,6 @@ class SubscriberManager {
 		// Sender and Subject of the mail.
 		$sender = 'subscriptions@example.com';
 		$subject = 'New Article alert for you!';
-		$mailer = new Mailer($this->config);
 		foreach ($subscribers as $subscriber) {
 			// Customized message of the mail.
 			$message = sprintf(<<<EOF
@@ -29,7 +28,7 @@ You can visit the link below to read the article below. To unsubscribe, browse t
 EOF
 					, $subscriber['name']);
 			
-			$mailer->send_mail($sender, $subscriber['email'], $subject, $message);
+			$this->mailer->send_mail($sender, $subscriber['email'], $subject, $message);
 	}
 }
 }
